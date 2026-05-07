@@ -5,35 +5,38 @@
  * 各端测试 import 这份 spec 跑 · 行为强一致
  */
 
-export type Outcome = 'callback-fired' | 'callback-skipped'
+export type SelectOutcome = 'select-fired-and-close' | 'no-op'
+export type CloseSource = 'backdrop' | 'close-button' | 'select' | 'esc'
 
-export interface Scenario {
+export interface SelectScenario {
   name: string
-  props: { disabled?: boolean; loading?: boolean }
-  /** 模拟一次"按下" · 期望结果 */
-  onPressOutcome: Outcome
+  /** 模拟点击的 agent id */
+  clickId: string
+  /** 当前 activeId */
+  activeId?: string
+  outcome: SelectOutcome
 }
 
-/** 共享场景 · Web + RN 都跑 */
-export const buttonScenarios: Scenario[] = [
+/** 选择场景 · 任何角色被点都该 fire onSelect + onClose */
+export const selectScenarios: SelectScenario[] = [
   {
-    name: 'default · 按下触发回调',
-    props: {},
-    onPressOutcome: 'callback-fired',
+    name: '默认 · 点角色 · onSelect + onClose 都触发',
+    clickId: 'a1',
+    outcome: 'select-fired-and-close',
   },
   {
-    name: 'disabled · 按下不触发',
-    props: { disabled: true },
-    onPressOutcome: 'callback-skipped',
+    name: '点已激活的角色 · 仍触发 onSelect + onClose (用户可能想确认)',
+    clickId: 'a1',
+    activeId: 'a1',
+    outcome: 'select-fired-and-close',
   },
   {
-    name: 'loading · 按下不触发',
-    props: { loading: true },
-    onPressOutcome: 'callback-skipped',
-  },
-  {
-    name: 'disabled + loading · 按下不触发',
-    props: { disabled: true, loading: true },
-    onPressOutcome: 'callback-skipped',
+    name: '点不同角色 · onSelect 带新 id',
+    clickId: 'a2',
+    activeId: 'a1',
+    outcome: 'select-fired-and-close',
   },
 ]
+
+/** 关闭场景 · 4 个来源都该触发 onClose */
+export const closeSources: CloseSource[] = ['backdrop', 'close-button', 'select', 'esc']

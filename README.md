@@ -1,6 +1,8 @@
 # @akong/agent-switcher
 
-akong AgentSwitcher · 极简 · 跨端 (Web + React Native)
+akong AgentSwitcher · 数字角色切换器 · 跨端 (Web + React Native)
+
+drawer-style modal · 列我的所有数字角色 · 切换 + 新建入口。
 
 ## Demo
 
@@ -15,55 +17,87 @@ npm i github:yarnovo/akong-agent-switcher github:yarnovo/akong-tokens
 ## Web
 
 ```tsx
+import { useState } from 'react'
 import { AgentSwitcher } from '@akong/agent-switcher'
 import '@akong/agent-switcher/style.css'
-import '@akong/tokens/style.css'  // 顶层引一次 token (整个 app 共用)
+import '@akong/tokens/style.css'  // 顶层引一次 token
 
-<AgentSwitcher variant="primary" size="md" onClick={...}>下单</AgentSwitcher>
-<AgentSwitcher variant="secondary" loading>处理中</AgentSwitcher>
-<AgentSwitcher variant="ghost" iconLeft={<Plus />}>新建</AgentSwitcher>
-<AgentSwitcher variant="destructive" disabled>删除</AgentSwitcher>
-<AgentSwitcher variant="link">查看详情</AgentSwitcher>
+const agents = [
+  { id: 'a1', name: '阿空小喜', tagline: '相亲红娘 · 帮你找对象', avatar: '💝' },
+  { id: 'a2', name: '阿空大优', tagline: '邮件助理 · 收发提醒', avatar: '📮' },
+  { id: 'a3', name: '阿空小研', tagline: '用户调研 · 产品经理', avatar: '🔍' },
+]
+
+function App() {
+  const [open, setOpen] = useState(false)
+  const [activeId, setActiveId] = useState('a1')
+  return (
+    <>
+      <button onClick={() => setOpen(true)}>切换角色</button>
+      <AgentSwitcher
+        open={open}
+        onClose={() => setOpen(false)}
+        agents={agents}
+        activeId={activeId}
+        onSelect={setActiveId}
+        onCreateNew={() => alert('新建')}
+      />
+    </>
+  )
+}
 ```
 
 ## React Native
 
 ```tsx
 import { AgentSwitcher } from '@akong/agent-switcher'
-
-<AgentSwitcher variant="primary" size="md" onPress={...}>下单</AgentSwitcher>
+// 同上 · Metro 自动按 .native.tsx 解析
 ```
-
-Metro bundler 自动按 `.native.tsx` 后缀解析 · 同 `import` 路径两端通用。
 
 ## API
 
 | Prop | Type | Default | 说明 |
 |---|---|---|---|
-| variant | `primary` / `secondary` / `ghost` / `destructive` / `link` | `primary` | |
-| size | `sm` / `md` / `lg` | `md` | |
-| disabled | boolean | false | |
-| loading | boolean | false | 转圈 + 锁交互 |
-| fullWidth | boolean | false | |
-| iconLeft / iconRight | ReactNode | — | |
-| onClick / onPress | () => void | — | Web 用 onClick · RN 用 onPress · 都传也行 |
-| ariaLabel | string | — | a11y |
+| open | `boolean` | — | 是否打开 |
+| onClose | `() => void` | — | 关闭回调 (backdrop / × / 选中后 / ESC) |
+| agents | `AgentSwitcherItem[]` | — | 角色列表 |
+| activeId | `string` | — | 当前激活的角色 id (右侧对勾) |
+| onSelect | `(id: string) => void` | — | 选中回调 (会随后触发 onClose) |
+| onCreateNew | `() => void` | — | 新建回调 (不传则隐藏 + 新建按钮) |
+| title | `string` | `'切换数字角色'` | 顶部标题 |
+
+`AgentSwitcherItem`:
+
+```ts
+{ id: string; name: string; tagline: string; avatar: string }
+```
+
+`avatar` 既接 URL (`https://...` / `data:` / `/path`)，也接 emoji / 单字符 (走文字回退)。
 
 ## 设计原则
 
 - **一份 props**：Web 跟 RN 共享 `AgentSwitcher.types.ts`
-- **两端实现**：`AgentSwitcher.tsx` (Web · DOM `<button>`) + `AgentSwitcher.native.tsx` (RN · `<Pressable>`)
-- **触摸目标 ≥ 44pt**：所有 size 都满足 iOS HIG
-- **极简反馈**：active 0.7 opacity (不缩放 · 不晃)
+- **两端实现**：`AgentSwitcher.tsx` (Web · DOM `<dialog>`) + `AgentSwitcher.native.tsx` (RN · `Modal` + `Animated.View`)
+- **触摸目标 ≥ 56px**：每行 44px 头像 + 12px padding
+- **极简反馈**：press 0.7 opacity (不缩放 · 不晃)
 - **token 100% 接 @akong/tokens**：改一处 token 自动 update
+- **iOS 安全区**：`env(safe-area-inset-bottom)`
 
-## 状态
+## 行为
 
-| 状态 | Web | RN |
-|---|---|---|
-| default | `:not(:active)` | `pressed: false` |
-| active | `:active` opacity 0.7 | `pressed: true` opacity 0.7 |
-| hover | `:hover` (桌面 only) | — |
-| disabled | `disabled` opacity 0.4 | `disabled` opacity 0.4 |
-| loading | `.ak-btn--loading` 转圈 | `<ActivityIndicator />` |
-| focus | `:focus-visible` outline | RN 默认 a11y focus |
+| 触发 | 结果 |
+|---|---|
+| 点 backdrop | onClose |
+| 点 × 关闭按钮 | onClose |
+| ESC (Web) | onClose |
+| 点角色 | onSelect(id) → onClose |
+| 点 + 新建 | onCreateNew → onClose |
+
+## 视觉
+
+- 模态弹层 · backdrop fade-in · drawer slide-up from bottom
+- max-w-[480px] mx-auto · 顶部圆角 `var(--ak-radius-2xl)`
+- 顶部 grabber 横线 (40×4 · `var(--ak-border)`)
+- 标题居中 · `text-md font-semibold`
+- list: 头像 44×44 + name + tagline (line-clamp-1) + active 项右对勾
+- 底部 + 新建按钮 (full-width · secondary 风)

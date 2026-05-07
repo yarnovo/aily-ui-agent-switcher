@@ -1,139 +1,249 @@
-/* akong-button · Web 样式 · 用 var(--ak-*) 接 @akong/tokens */
+/* akong AgentSwitcher · Web 样式 · 用 var(--ak-*) 接 @akong/tokens */
 
-.ak-agent-switcher {
+/* === Backdrop (半透明黑覆盖) === */
+.ak-agent-switcher__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.45);
+  z-index: var(--ak-z-overlay);
+  animation: ak-agent-switcher-fade-in var(--ak-duration-base) var(--ak-ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === Drawer (从底部 slide-up · max-w 480 居中) === */
+.ak-agent-switcher__drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--ak-z-modal);
+  max-width: 480px;
+  margin-inline: auto;
+  background: var(--ak-bg-elevated);
+  color: var(--ak-fg);
+  border-top-left-radius: var(--ak-radius-2xl);
+  border-top-right-radius: var(--ak-radius-2xl);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: var(--ak-shadow-lg);
+  font-family: var(--ak-font-sans);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: ak-agent-switcher-slide-up var(--ak-duration-slow) var(--ak-ease-out);
+}
+
+/* === Grabber (顶部小横线) === */
+.ak-agent-switcher__grabber {
+  width: 40px;
+  height: 4px;
+  border-radius: var(--ak-radius-full);
+  background: var(--ak-border);
+  margin: var(--ak-space-3) auto var(--ak-space-2);
+  flex-shrink: 0;
+}
+
+/* === Header (标题 + 关闭按钮) === */
+.ak-agent-switcher__header {
+  position: relative;
+  text-align: center;
+  padding: var(--ak-space-2) var(--ak-space-12) var(--ak-space-3);
+  flex-shrink: 0;
+}
+.ak-agent-switcher__title {
+  font-size: var(--ak-text-md);
+  font-weight: var(--ak-weight-semibold);
+  letter-spacing: var(--ak-tracking-tight);
+  color: var(--ak-fg);
+  margin: 0;
+}
+.ak-agent-switcher__close {
+  position: absolute;
+  top: 50%;
+  right: var(--ak-space-3);
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ak-space-2);
-  font-family: var(--ak-font-sans);
-  font-weight: var(--ak-weight-medium);
-  letter-spacing: var(--ak-tracking-tight);
+  background: transparent;
   border: 0;
-  border-radius: var(--ak-radius-full);
+  color: var(--ak-fg-subtle);
   cursor: pointer;
-  user-select: none;
+  border-radius: var(--ak-radius-full);
+  font-size: 20px;
+  line-height: 1;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition:
-    background-color var(--ak-duration-fast) var(--ak-ease-out),
-    color var(--ak-duration-fast) var(--ak-ease-out),
-    opacity var(--ak-duration-fast) var(--ak-ease-out);
-  white-space: nowrap;
-  outline: none;
+  transition: opacity var(--ak-duration-fast) var(--ak-ease-out);
 }
-
-.ak-agent-switcher:focus-visible {
+.ak-agent-switcher__close:active {
+  opacity: 0.7;
+}
+.ak-agent-switcher__close:focus-visible {
   outline: 2px solid var(--ak-border-strong);
   outline-offset: 2px;
 }
 
-.ak-agent-switcher:active:not(:disabled) {
-  opacity: 0.7;
+/* === List (滚动区) === */
+.ak-agent-switcher__list {
+  list-style: none;
+  margin: 0;
+  padding: var(--ak-space-1) var(--ak-space-2) var(--ak-space-2);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ak-agent-switcher__list:empty + .ak-agent-switcher__empty {
+  display: block;
 }
 
-.ak-agent-switcher:disabled,
-.ak-agent-switcher[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-/* === Sizes === */
-.ak-agent-switcher--sm {
-  height: 32px;
-  padding: 0 var(--ak-space-3);
+.ak-agent-switcher__empty {
+  padding: var(--ak-space-8) var(--ak-space-4);
+  text-align: center;
+  color: var(--ak-fg-subtle);
   font-size: var(--ak-text-sm);
-  min-width: 32px;
-}
-.ak-agent-switcher--md {
-  height: 40px;
-  padding: 0 var(--ak-space-4);
-  font-size: var(--ak-text-base);
-  min-width: 40px;
-}
-.ak-agent-switcher--lg {
-  height: 48px;
-  padding: 0 var(--ak-space-5);
-  font-size: var(--ak-text-md);
-  min-width: 48px;
 }
 
-/* === Variants === */
-.ak-agent-switcher--primary {
-  background: var(--ak-fg);
-  color: var(--ak-fg-inverse);
+.ak-agent-switcher__item {
+  display: flex;
+  align-items: center;
+  gap: var(--ak-space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--ak-space-2) var(--ak-space-3);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--ak-radius-lg);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-color var(--ak-duration-fast) var(--ak-ease-out),
+    opacity var(--ak-duration-fast) var(--ak-ease-out);
 }
-.ak-agent-switcher--primary:hover:not(:disabled) {
-  background: var(--ak-gray-11);
-}
-
-.ak-agent-switcher--secondary {
-  background: var(--ak-bg-subtle);
-  color: var(--ak-fg);
-}
-.ak-agent-switcher--secondary:hover:not(:disabled) {
+.ak-agent-switcher__item:hover {
   background: var(--ak-bg-hover);
 }
-
-.ak-agent-switcher--ghost {
-  background: transparent;
-  color: var(--ak-fg);
+.ak-agent-switcher__item:active {
+  opacity: 0.7;
 }
-.ak-agent-switcher--ghost:hover:not(:disabled) {
+.ak-agent-switcher__item:focus-visible {
+  outline: 2px solid var(--ak-border-strong);
+  outline-offset: -2px;
+}
+.ak-agent-switcher__item--active {
   background: var(--ak-bg-subtle);
 }
 
-.ak-agent-switcher--destructive {
-  background: var(--ak-accent);
-  color: var(--ak-accent-fg);
-}
-.ak-agent-switcher--destructive:hover:not(:disabled) {
-  background: var(--ak-accent-10);
-}
-
-.ak-agent-switcher--link {
-  background: transparent;
-  color: var(--ak-fg);
-  padding: 0;
-  height: auto;
-  min-width: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--ak-border-strong);
-}
-.ak-agent-switcher--link:hover:not(:disabled) {
-  text-decoration-color: var(--ak-fg);
-}
-
-/* === Modifiers === */
-.ak-agent-switcher--full-width { width: 100%; }
-
-.ak-agent-switcher--loading {
-  pointer-events: none;
-  position: relative;
-  color: transparent !important;
-}
-.ak-agent-switcher--loading::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  color: var(--ak-fg-muted);
-  animation: ak-spin 0.7s linear infinite;
-}
-.ak-agent-switcher--primary.ak-agent-switcher--loading::after,
-.ak-agent-switcher--destructive.ak-agent-switcher--loading::after {
-  color: var(--ak-fg-inverse);
-}
-
-@keyframes ak-spin {
-  to { transform: rotate(360deg); }
-}
-
-.ak-agent-switcher__icon {
+.ak-agent-switcher__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ak-radius-full);
+  background: var(--ak-bg-subtle);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  font-size: var(--ak-text-lg);
+  color: var(--ak-fg);
+}
+.ak-agent-switcher__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-agent-switcher__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ak-agent-switcher__name {
+  font-size: var(--ak-text-base);
+  font-weight: var(--ak-weight-semibold);
+  color: var(--ak-fg);
+  line-height: var(--ak-leading-snug);
+  letter-spacing: var(--ak-tracking-tight);
+}
+.ak-agent-switcher__tagline {
+  font-size: var(--ak-text-sm);
+  color: var(--ak-fg-subtle);
+  line-height: var(--ak-leading-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ak-agent-switcher__check {
+  flex-shrink: 0;
+  color: var(--ak-fg);
+  font-size: var(--ak-text-md);
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === Footer (新建按钮) === */
+.ak-agent-switcher__footer {
+  padding: var(--ak-space-3) var(--ak-space-4) var(--ak-space-4);
+  border-top: 1px solid var(--ak-border-subtle);
+  flex-shrink: 0;
+}
+.ak-agent-switcher__create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ak-space-2);
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--ak-space-4);
+  background: var(--ak-bg-subtle);
+  color: var(--ak-fg);
+  border: 0;
+  border-radius: var(--ak-radius-full);
+  font-family: inherit;
+  font-size: var(--ak-text-base);
+  font-weight: var(--ak-weight-medium);
+  letter-spacing: var(--ak-tracking-tight);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-color var(--ak-duration-fast) var(--ak-ease-out),
+    opacity var(--ak-duration-fast) var(--ak-ease-out);
+}
+.ak-agent-switcher__create:hover {
+  background: var(--ak-bg-hover);
+}
+.ak-agent-switcher__create:active {
+  opacity: 0.7;
+}
+.ak-agent-switcher__create:focus-visible {
+  outline: 2px solid var(--ak-border-strong);
+  outline-offset: 2px;
+}
+
+/* === Animations === */
+@keyframes ak-agent-switcher-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ak-agent-switcher-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

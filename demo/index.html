@@ -16,66 +16,234 @@
     padding: var(--ak-space-6);
     max-width: 760px;
     margin-inline: auto;
+    min-height: 100vh;
+    box-sizing: border-box;
   }
   h1 { font-size: var(--ak-text-2xl); font-weight: var(--ak-weight-semibold); letter-spacing: var(--ak-tracking-tight); margin: 0 0 var(--ak-space-2); }
   .sub { color: var(--ak-fg-subtle); font-size: var(--ak-text-sm); margin-bottom: var(--ak-space-8); }
   h2 { font-size: var(--ak-text-md); font-weight: var(--ak-weight-semibold); margin: var(--ak-space-8) 0 var(--ak-space-3); }
-  .row { display: flex; gap: var(--ak-space-3); flex-wrap: wrap; align-items: center; padding: var(--ak-space-3); background: var(--ak-bg-subtle); border-radius: var(--ak-radius-md); }
-  .toggle { position: fixed; top: 16px; right: 16px; padding: 8px 12px; border-radius: var(--ak-radius-full); background: var(--ak-fg); color: var(--ak-bg); border: 0; font-size: var(--ak-text-sm); cursor: pointer; }
+  .row { display: flex; gap: var(--ak-space-3); flex-wrap: wrap; align-items: center; padding: var(--ak-space-4); background: var(--ak-bg-subtle); border-radius: var(--ak-radius-md); }
+  .toggle { position: fixed; top: 16px; right: 16px; padding: 8px 12px; border-radius: var(--ak-radius-full); background: var(--ak-fg); color: var(--ak-bg); border: 0; font-size: var(--ak-text-sm); cursor: pointer; z-index: 100; }
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 var(--ak-space-4);
+    background: var(--ak-fg);
+    color: var(--ak-fg-inverse);
+    border: 0;
+    border-radius: var(--ak-radius-full);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--ak-text-base);
+    font-weight: var(--ak-weight-medium);
+  }
+  .trigger:active { opacity: 0.7; }
 </style>
 </head>
 <body>
   <button class="toggle" id="t">切换暗色</button>
   <h1>akong AgentSwitcher</h1>
-  <p class="sub">5 variant · 3 size · 跨 Web/RN · 真值跨端 · 一份 props</p>
+  <p class="sub">数字角色切换器 · drawer-style modal · 跨 Web/RN · 一份 props</p>
 
-  <h2>Variants (size=md)</h2>
+  <h2>3 角色 (默认场景)</h2>
   <div class="row">
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md"><span>Primary</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--secondary ak-agent-switcher--md"><span>Secondary</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--ghost ak-agent-switcher--md"><span>Ghost</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--destructive ak-agent-switcher--md"><span>Destructive</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--link"><span>Link</span></button>
+    <button class="trigger" data-demo="default">打开切换器</button>
   </div>
 
-  <h2>Sizes (variant=primary)</h2>
+  <h2>带新建按钮</h2>
   <div class="row">
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--sm"><span>Small</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md"><span>Medium</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--lg"><span>Large</span></button>
+    <button class="trigger" data-demo="with-create">打开 (含 + 新建)</button>
   </div>
 
-  <h2>States</h2>
+  <h2>空列表</h2>
   <div class="row">
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md"><span>Default</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md ak-agent-switcher--loading"><span>Loading</span></button>
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md" disabled><span>Disabled</span></button>
+    <button class="trigger" data-demo="empty">打开 (空 list)</button>
   </div>
 
-  <h2>With Icons</h2>
+  <h2>长列表 (8 角色)</h2>
   <div class="row">
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md">
-      <span class="ak-agent-switcher__icon">+</span>
-      <span>Add</span>
-    </button>
-    <button class="ak-agent-switcher ak-agent-switcher--secondary ak-agent-switcher--md">
-      <span>Next</span>
-      <span class="ak-agent-switcher__icon">→</span>
-    </button>
-    <button class="ak-agent-switcher ak-agent-switcher--ghost ak-agent-switcher--md" aria-label="search">
-      <span class="ak-agent-switcher__icon">🔍</span>
-    </button>
+    <button class="trigger" data-demo="long">打开 (长 list · 滚动)</button>
   </div>
 
-  <h2>Full width</h2>
-  <div class="row" style="display: block;">
-    <button class="ak-agent-switcher ak-agent-switcher--primary ak-agent-switcher--md ak-agent-switcher--full-width"><span>占满整行</span></button>
+  <h2>已激活某角色 + 自定义 title</h2>
+  <div class="row">
+    <button class="trigger" data-demo="active">打开 (activeId=a2)</button>
+  </div>
+
+  <!-- mounted markup demos (通过 JS 加 / 删 class .open) -->
+
+  <!-- Default 3 agents -->
+  <div class="ak-demo" id="demo-default" hidden>
+    <div class="ak-agent-switcher__backdrop" data-close></div>
+    <div class="ak-agent-switcher__drawer" role="dialog">
+      <div class="ak-agent-switcher__grabber"></div>
+      <div class="ak-agent-switcher__header">
+        <h2 class="ak-agent-switcher__title">切换数字角色</h2>
+        <button class="ak-agent-switcher__close" data-close>×</button>
+      </div>
+      <ul class="ak-agent-switcher__list">
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>💝</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小喜</span><span class="ak-agent-switcher__tagline">相亲红娘 · 帮你找对象</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>📮</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空大优</span><span class="ak-agent-switcher__tagline">邮件助理 · 收发提醒</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>🔍</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小研</span><span class="ak-agent-switcher__tagline">用户调研 · 产品经理</span></span>
+        </button></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 含 + 新建 -->
+  <div class="ak-demo" id="demo-with-create" hidden>
+    <div class="ak-agent-switcher__backdrop" data-close></div>
+    <div class="ak-agent-switcher__drawer" role="dialog">
+      <div class="ak-agent-switcher__grabber"></div>
+      <div class="ak-agent-switcher__header">
+        <h2 class="ak-agent-switcher__title">切换数字角色</h2>
+        <button class="ak-agent-switcher__close" data-close>×</button>
+      </div>
+      <ul class="ak-agent-switcher__list">
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>💝</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小喜</span><span class="ak-agent-switcher__tagline">相亲红娘 · 帮你找对象</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>📮</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空大优</span><span class="ak-agent-switcher__tagline">邮件助理 · 收发提醒</span></span>
+        </button></li>
+      </ul>
+      <div class="ak-agent-switcher__footer">
+        <button class="ak-agent-switcher__create" data-close><span>+</span><span>新建角色</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空 list -->
+  <div class="ak-demo" id="demo-empty" hidden>
+    <div class="ak-agent-switcher__backdrop" data-close></div>
+    <div class="ak-agent-switcher__drawer" role="dialog">
+      <div class="ak-agent-switcher__grabber"></div>
+      <div class="ak-agent-switcher__header">
+        <h2 class="ak-agent-switcher__title">切换数字角色</h2>
+        <button class="ak-agent-switcher__close" data-close>×</button>
+      </div>
+      <div class="ak-agent-switcher__empty">还没有数字角色</div>
+      <div class="ak-agent-switcher__footer">
+        <button class="ak-agent-switcher__create" data-close><span>+</span><span>新建角色</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 长 list -->
+  <div class="ak-demo" id="demo-long" hidden>
+    <div class="ak-agent-switcher__backdrop" data-close></div>
+    <div class="ak-agent-switcher__drawer" role="dialog">
+      <div class="ak-agent-switcher__grabber"></div>
+      <div class="ak-agent-switcher__header">
+        <h2 class="ak-agent-switcher__title">切换数字角色</h2>
+        <button class="ak-agent-switcher__close" data-close>×</button>
+      </div>
+      <ul class="ak-agent-switcher__list">
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>💝</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小喜</span><span class="ak-agent-switcher__tagline">相亲红娘 · 帮你找对象</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>📮</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空大优</span><span class="ak-agent-switcher__tagline">邮件助理 · 收发提醒 · 自动归类草稿</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>🔍</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小研</span><span class="ak-agent-switcher__tagline">用户调研 · 产品经理 · 挖掘真痛点</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>⚖️</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空法律</span><span class="ak-agent-switcher__tagline">合同审查 · 风险提示</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item ak-agent-switcher__item--active" data-close aria-selected="true">
+          <span class="ak-agent-switcher__avatar"><span>📊</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空会计</span><span class="ak-agent-switcher__tagline">记账 · 报销 · 月度报表</span></span>
+          <span class="ak-agent-switcher__check">✓</span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>🎓</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空留学</span><span class="ak-agent-switcher__tagline">海外申请 · 文书润色</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>🏠</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空租房</span><span class="ak-agent-switcher__tagline">找房 · 看房 · 谈合同</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>💼</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空招聘</span><span class="ak-agent-switcher__tagline">JD 优化 · 候选人筛选 · 面试题</span></span>
+        </button></li>
+      </ul>
+      <div class="ak-agent-switcher__footer">
+        <button class="ak-agent-switcher__create" data-close><span>+</span><span>新建角色</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- activeId 示例 + 自定义 title -->
+  <div class="ak-demo" id="demo-active" hidden>
+    <div class="ak-agent-switcher__backdrop" data-close></div>
+    <div class="ak-agent-switcher__drawer" role="dialog">
+      <div class="ak-agent-switcher__grabber"></div>
+      <div class="ak-agent-switcher__header">
+        <h2 class="ak-agent-switcher__title">选择一个伙伴</h2>
+        <button class="ak-agent-switcher__close" data-close>×</button>
+      </div>
+      <ul class="ak-agent-switcher__list">
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>💝</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小喜</span><span class="ak-agent-switcher__tagline">相亲红娘 · 帮你找对象</span></span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item ak-agent-switcher__item--active" data-close aria-selected="true">
+          <span class="ak-agent-switcher__avatar"><span>📮</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空大优</span><span class="ak-agent-switcher__tagline">邮件助理 · 收发提醒</span></span>
+          <span class="ak-agent-switcher__check">✓</span>
+        </button></li>
+        <li><button class="ak-agent-switcher__item" data-close>
+          <span class="ak-agent-switcher__avatar"><span>🔍</span></span>
+          <span class="ak-agent-switcher__meta"><span class="ak-agent-switcher__name">阿空小研</span><span class="ak-agent-switcher__tagline">用户调研 · 产品经理</span></span>
+        </button></li>
+      </ul>
+    </div>
   </div>
 
 <script>
+  // 暗色切换
   document.getElementById('t').onclick = () => {
     document.documentElement.classList.toggle('dark')
   }
+
+  // 打开 / 关闭 demo
+  function show(id) {
+    document.querySelectorAll('.ak-demo').forEach(el => el.hidden = true)
+    document.getElementById(id).hidden = false
+  }
+  function closeAll() {
+    document.querySelectorAll('.ak-demo').forEach(el => el.hidden = true)
+  }
+  document.querySelectorAll('button[data-demo]').forEach(btn => {
+    btn.onclick = () => show('demo-' + btn.dataset.demo)
+  })
+  document.addEventListener('click', (e) => {
+    const t = e.target
+    if (t && t.closest && t.closest('[data-close]')) {
+      closeAll()
+    }
+  })
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAll()
+  })
 </script>
 </body>
 </html>
