@@ -1,5 +1,7 @@
 # @akong/agent-switcher
 
+> ← 回 [akong design system](https://yarnovo.github.io/akong-core/) 总站
+
 akong AgentSwitcher · 数字角色切换器 · 跨端 (Web + React Native)
 
 drawer-style modal · 列我的所有数字角色 · 切换 + 新建入口。
