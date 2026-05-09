@@ -18,7 +18,7 @@ import {
   Easing,
   type ImageSourcePropType,
 } from 'react-native'
-import { tokens } from '@akong/tokens'
+import { tokens } from '@aily-ui/tokens'
 import type { AgentSwitcherProps, AgentSwitcherItem } from './AgentSwitcher.types'
 
 function isUrl(s: string) {
